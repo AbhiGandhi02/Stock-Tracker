@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Stock Market</h2>
+            <select id="exchange-select">
+                <option value="NS">NSE</option>
+                <option value="US">NYSE/NASDAQ</option>
+            </select>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="stock-search" placeholder="Enter Stock Symbol...">
+            <button id="search-btn">Search</button>
+        </div>
+
+        <div class="stock-header">
+            <span class="stock-name">Stock</span>
+            <span class="stock-price">Current Price</span>
+            <span class="morning-price">Morning Price</span>
+            <span class="stock-change">Return %</span>
+        </div>
+
+        <div class="watchlist">
+            <ul class="stock-list">
+                <!-- 📌 Stocks will be dynamically inserted here -->
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+<!-- 1TYHO46QYC4UJY2J -->
