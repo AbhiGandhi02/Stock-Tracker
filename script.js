@@ -195,3 +195,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPopularStocks();
     setInterval(loadPopularStocks, 30000);
 });
+
+
+// The code is working fine for NYSE stocks but not for NSE stocks as the alpha vantage api has rate limit it is not generating the data properly also not showing 5 stocks in the list.
