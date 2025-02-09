@@ -150,3 +150,48 @@ document.addEventListener("click", (event) => {
         clearSuggestions();
     }
 });
+
+// Add popular stocks data
+const popularStocks = {
+    'NSE': ['TCS.BSE', 'RELIANCE.BSE', 'HDFCBANK.BSE', 'INFY.BSE', 'ICICIBANK.BSE'],
+    'NYSE': ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
+};
+
+async function loadPopularStocks() {
+    stockList.innerHTML = '<li class="loading">Loading popular stocks...</li>';
+    
+    const exchange = exchangeSelect.value;
+    const stocks = popularStocks[exchange === 'NS' ? 'NSE' : 'NYSE'];
+    
+    stockList.innerHTML = '';
+    
+    try {
+        for (const symbol of stocks) {
+            const stockData = await fetchStockData(symbol);
+            if (stockData) {
+                const stockItem = document.createElement("li");
+                stockItem.innerHTML = `
+                    <span class="stock-name">${stockData.symbol}</span>
+                    <span class="stock-price">$${stockData.currentPrice}</span>
+                    <span class="morning-price">$${stockData.morningPrice}</span>
+                    <span class="stock-change ${stockData.isPositive ? 'positive' : 'negative'}">
+                        ${stockData.isPositive ? '+' : '-'}${stockData.changePercent}%
+                    </span>
+                `;
+                stockList.appendChild(stockItem);
+            }
+        }
+    } catch (error) {
+        console.error('Error loading stocks:', error);
+        stockList.innerHTML = '<li class="error">Error loading stocks. Please try again later.</li>';
+    }
+}
+
+// Add event listener for exchange selection change
+exchangeSelect.addEventListener("change", loadPopularStocks);
+
+// Load popular stocks when page loads and update every 30 seconds
+document.addEventListener("DOMContentLoaded", () => {
+    loadPopularStocks();
+    setInterval(loadPopularStocks, 30000);
+});
