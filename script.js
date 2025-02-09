@@ -73,7 +73,10 @@ function clearSuggestions() {
 async function fetchStockData(symbol) {
     let url;
 
-    if (exchangeSelect.value === "NSE" || exchangeSelect.value === "BSE") {
+    if (exchangeSelect.value === "NS" || exchangeSelect.value === "BSE") {
+        // changestock symobol from abc.NS to abc.BSE
+        console.log(symbol);
+        symbol = symbol.replace(".NS", ".BSE");
         url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&outputsize=compact&apikey=${alphaVantageApiKey}`;
     } else {
         url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubApiKey}`;
@@ -83,7 +86,8 @@ async function fetchStockData(symbol) {
         const response = await fetch(url);
         const data = await response.json();
 
-        if (exchangeSelect.value === "NSE" || exchangeSelect.value === "BSE") {
+        if (exchangeSelect.value === "NS" || exchangeSelect.value === "BSE") {
+            // console.log(data);
             const timeSeries = data["Time Series (Daily)"];
             if (!timeSeries) {
                 console.warn("Alpha Vantage response:", data);
