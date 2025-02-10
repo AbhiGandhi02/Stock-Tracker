@@ -44,7 +44,7 @@ function displaySuggestions(suggestions) {
         let symbol = item.symbol;
 
         // Ensure correct symbol format for NSE/BSE
-        if (exchangeSelect.value === "NSE") {
+        if (exchangeSelect.value === "NS") {
             symbol = `${symbol}.BSE`; // Alpha Vantage uses `.BSE` for NSE stocks
         }
 
@@ -72,12 +72,12 @@ function clearSuggestions() {
 // Fetch stock data (Fixed: Uses correct format for NSE/BSE)
 async function fetchStockData(symbol) {
     let url;
+    let currencySymbol = "$"; // Default to USD
 
     if (exchangeSelect.value === "NS" || exchangeSelect.value === "BSE") {
-        // changestock symobol from abc.NS to abc.BSE
-        console.log(symbol);
-        symbol = symbol.replace(".NS", ".BSE");
+        symbol = symbol.replace(".NS", ".BSE"); // Ensure correct format for Alpha Vantage
         url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&outputsize=compact&apikey=${alphaVantageApiKey}`;
+        currencySymbol = "₹"; // Set currency to INR for NSE/BSE
     } else {
         url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubApiKey}`;
     }
@@ -87,7 +87,6 @@ async function fetchStockData(symbol) {
         const data = await response.json();
 
         if (exchangeSelect.value === "NS" || exchangeSelect.value === "BSE") {
-            // console.log(data);
             const timeSeries = data["Time Series (Daily)"];
             if (!timeSeries) {
                 console.warn("Alpha Vantage response:", data);
@@ -99,16 +98,16 @@ async function fetchStockData(symbol) {
 
             return {
                 symbol,
-                currentPrice: parseFloat(latestData["4. close"]).toFixed(2),
-                morningPrice: parseFloat(latestData["1. open"]).toFixed(2),
+                currentPrice: `${currencySymbol}${parseFloat(latestData["4. close"]).toFixed(2)}`,
+                morningPrice: `${currencySymbol}${parseFloat(latestData["1. open"]).toFixed(2)}`,
                 changePercent: (((latestData["4. close"] - latestData["1. open"]) / latestData["1. open"]) * 100).toFixed(2),
                 isPositive: latestData["4. close"] >= latestData["1. open"]
             };
         } else {
             return {
                 symbol,
-                currentPrice: data.c.toFixed(2),
-                morningPrice: data.o.toFixed(2),
+                currentPrice: `${currencySymbol}${data.c.toFixed(2)}`,
+                morningPrice: `${currencySymbol}${data.o.toFixed(2)}`,
                 changePercent: ((data.c - data.o) / data.o * 100).toFixed(2),
                 isPositive: data.c >= data.o
             };
@@ -129,8 +128,8 @@ async function handleSearch(symbol) {
         const stockItem = document.createElement("li");
         stockItem.innerHTML = `
             <span class="stock-name">${stockData.symbol}</span>
-            <span class="stock-price">$${stockData.currentPrice}</span>
-            <span class="morning-price">$${stockData.morningPrice}</span>
+            <span class="stock-price">${stockData.currentPrice}</span>
+            <span class="morning-price">${stockData.morningPrice}</span>
             <span class="stock-change ${stockData.isPositive ? 'positive' : 'negative'}">
                 ${stockData.isPositive ? '+' : '-'}${stockData.changePercent}%
             </span>
@@ -172,8 +171,8 @@ async function loadPopularStocks() {
                 const stockItem = document.createElement("li");
                 stockItem.innerHTML = `
                     <span class="stock-name">${stockData.symbol}</span>
-                    <span class="stock-price">$${stockData.currentPrice}</span>
-                    <span class="morning-price">$${stockData.morningPrice}</span>
+                    <span class="stock-price">${stockData.currentPrice}</span>
+                    <span class="morning-price">${stockData.morningPrice}</span>
                     <span class="stock-change ${stockData.isPositive ? 'positive' : 'negative'}">
                         ${stockData.isPositive ? '+' : '-'}${stockData.changePercent}%
                     </span>
@@ -195,6 +194,3 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPopularStocks();
     setInterval(loadPopularStocks, 30000);
 });
-
-
-// The code is working fine for NYSE stocks but not for NSE stocks as the alpha vantage api has rate limit it is not generating the data properly also not showing 5 stocks in the list.
